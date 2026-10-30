@@ -1,3 +1,32 @@
+——————————————————————————————————————————————————————
+（本部分没有使用ai创作）
+**背景**
+对于皇室战争，大家起初都是在手机上运行的，安卓上有apk（以及许多apk的变种），也可以google store，ios上一般是直接app store安装。
+对于近期蒸蒸日上的firstlight，daybreak cr等ai挑战皇室战争项目和前后的许多项目，都顺便研究了如何增强皇室战争的跨平台性和原生性能。
+
+在daybreak cr的引擎中，已经实现在arm架构上直接运行libg实现了战斗引擎的极高效化，不过对于一般用于观察研究的可视化，尽管可以制作模拟器，但是并没有原生游戏直观，完全复现游戏源码则目前仍然极为困难。
+鉴于firstlight的管理，大家起初在mumu模拟器（国际版）上运行cr，好处是直接可以获取root，因此可以毫不费力的读到内存。
+一些同学在迁移firstlight到mac时，发现mumu收费（划掉），因此大家都选择了android studio，经过测试，这一比较原生的模拟器在google pixel 5下可以直接运行null服，而运行国际服则需要伪造真机指纹，不过可以解决。
+但是长期模拟器带来了一些不方便，启动慢和不知为何的闪退是主要问题，而且这样耦合的架构限制了进一步在其中进行步进调试的可能性。
+
+本菜菜之前尝试把ios的安装包（ipa）加入探针后移植到ios平台，取得了成功，但是在电脑上运行依然需要ios模拟器，而且因为不能root一些状态似乎不方便通讯。
+今天（20261031）就突发奇想试了一下能不能在mac原生上运行n服，因为一方面架构都是arm，机器码可以不用转译运行，另一方面最近也看到一些不用crossover就迁移成功的案例，就让astra大人试了一下。。
+然后就发现可以正常运行，有几个小问题，包括比例、签名（有一个现成的库）、账号储存等都已解决。
+目前正在研究用这个替换安卓模拟器和模型和其他分析器进行通讯，不过群友说要开源，所以就先放上来。
+
+**安装**
+1. 从n服的telegram或者一些奇怪的网站上下载15.535.13，也就是firstlight到daybreak cr一直的主流，也是现在n服所在版本的ipa。
+2. 运行下面这个脚本转换出来mac上的.app
+```bash
+python3 convert.py "/path/to/Nulls Royale 15.535.13 iOS.ipa" \
+  --output "$HOME/Library/Caches/nulls-royale-mac/build-01"
+```
+
+**以后**
+目前x86平台依然依赖模拟器，但好像cr也是有x86的安装包版本的，因为微软有段时间曾推行过电脑版手游，而对于顶层无论是linux还是windows，应该都可以迁移，这是后续可以尝试的方向。
+
+——————————————————————————————————————————————————————
+以下为AI爱看的。。。
 # Null's Royale → Mac Catalyst
 
 将自己提供的、已解密的 Null's Royale ARM64 IPA 转为可在 Apple Silicon Mac 运行的 Catalyst App。仅使用 Python 标准库和 Xcode 工具，不需要 pip 依赖。
@@ -99,12 +128,10 @@ Library/Application Support/ipa-keychain/items.plist
 
 静态签名及 section 验证只能证明构建完整性。登录、Game Center、支付等依赖 iOS 身份或服务的功能可能不兼容；这些功能不在本仓库验证范围。联网游戏仍需要其游戏服务器。
 
-本地验证结果见 [VALIDATION.md](VALIDATION.md)。
-
 ## 文件与第三方代码
 
 - `convert.py`：解包、转换、编译、注入、重签、校验和生成报告。
-- `src/portrait.mm`：独立竖屏窗口适配。
-- `vendor/ipa-keychain/`：来自 `ayush5harma/ipa-install-on-mac` 的 MIT 许可代码；保留原 LICENSE、固定提交和 SHA-256，转换前校验源码哈希。
+- `portrait.mm`：独立竖屏窗口适配。
+- `ipa-keychain.c`：来自 `ayush5harma/ipa-install-on-mac`；许可证见 `LICENSE.keychain`，固定提交和 SHA-256 记录在转换脚本中。
 
-移植代码采用 MIT 许可。第三方代码保留其原版权声明；该许可不涵盖游戏及其资源。
+第三方代码保留其原版权声明和 MIT 许可证；该许可不涵盖游戏及其资源。

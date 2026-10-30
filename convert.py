@@ -148,10 +148,12 @@ def main():
         parser.error('Full Xcode with the Mac Catalyst SDK is required; Command Line Tools alone are insufficient')
     for tool in ('clang', 'clang++', 'vtool', 'otool', 'lipo', 'install_name_tool'):
         run('xcrun', '--find', tool)
-    source = ROOT / 'vendor/ipa-keychain'
-    provenance = json.loads((source / 'source.json').read_text())
-    if digest(source / 'ipa-keychain.c') != provenance['sha256']:
-        raise ValueError('Vendored keychain source differs from source.json')
+    # https://github.com/ayush5harma/ipa-install-on-mac
+    # lib/ipa-keychain.c at f102181b711d6c06c1e42691640dbdade0fc4569 (MIT; LICENSE.keychain)
+    source = ROOT
+    expected = '26d11a5cd9080baffb3810a6f5ac060bbedf80bc4aa3fc32599969f90536e7c5'
+    if digest(source / 'ipa-keychain.c') != expected:
+        raise ValueError('Keychain source differs from the pinned upstream version')
     output.mkdir(parents=True, exist_ok=False)
     print('Extracting a new copy...', flush=True)
     app = extract(ipa, output)
@@ -213,7 +215,7 @@ def main():
             raise ValueError(f'Input already contains {name}; use the original IPA')
     run('xcrun', 'clang++', *common, '-fobjc-arc', '-isystem', support / 'usr/include',
         '-iframework', support / 'System/Library/Frameworks', '-F', support / 'System/Library/Frameworks',
-        '-L', support / 'usr/lib', ROOT / 'src/portrait.mm', '-framework', 'UIKit', '-framework', 'Foundation',
+        '-L', support / 'usr/lib', ROOT / 'portrait.mm', '-framework', 'UIKit', '-framework', 'Foundation',
         '-install_name', '@rpath/' + libraries[0], '-o', frameworks / libraries[0])
     run('xcrun', 'clang', *common, '-Wall', source / 'ipa-keychain.c',
         '-framework', 'CoreFoundation', '-framework', 'Security',
