@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/ayush5harma/ipa-install-on-mac",
+  "commit": "f102181b711d6c06c1e42691640dbdade0fc4569",
+  "path": "lib/ipa-keychain.c",
+  "sha256": "26d11a5cd9080baffb3810a6f5ac060bbedf80bc4aa3fc32599969f90536e7c5",
+  "license": "MIT"
+}
